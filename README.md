@@ -21,9 +21,13 @@
 | 首页 | 后台管理 |
 | :---: | :---: |
 | ![首页预览](https://github.com/user-attachments/assets/b106be25-5be4-4ae6-98aa-e1fae38b5a3d) | ![后台预览](https://github.com/user-attachments/assets/49461d13-e48b-400d-b15c-3fa2d1a0460e) |
-| ![首页预览](https://github.com/user-attachments/assets/b2508b55-bbf6-4998-a111-a7b75eb8686b) | ![后台预览](https://github.com/user-attachments/assets/d5c6e1c4-cb75-4c3c-b9fd-e203a361642f) |
+| ![首页预览](https://github.com/user-attachments/assets/822c1188-4b70-4aed-b5f6-c4c233c55fb2) | ![后台预览](https://github.com/user-attachments/assets/4d3bb3f4-da65-400a-a41d-eeaecedb7197) |
 
+| 大卡片 | 小卡片 |
+| :---: | :---: |
+| ![首页预览](https://github.com/user-attachments/assets/e77d1c10-aba4-4755-8a62-416fe3a8239e) | ![后台预览](https://github.com/user-attachments/assets/b2508b55-bbf6-4998-a111-a7b75eb8686b) |
 
+> 卡片的毛玻璃效果和程度可以在后台设置里自定义。
 ## ✨ 核心特性
 
 - 📱 **响应式设计**：完美适配桌面、平板和手机等各种设备。
@@ -47,7 +51,7 @@
 - 🛡️ **后台会话安全升级**：登录 `/admin` 时将颁发 12 小时有效的 HttpOnly 会话 Cookie，凭据不再暴露在 URL 中，并新增一键退出登录。
 - 🧹 **输入与展示双重校验**：新增 URL 规范化、HTML 转义与排序值归一化逻辑，前后台同时防止脏数据和潜在 XSS。
 - 🚪 **访客投稿可控**：通过 `ENABLE_PUBLIC_SUBMISSION` 环境变量即可关闭前台投稿入口，相关接口自动返回 403，方便运营期按需开关。
-- ⚙️ **增加AI一键自动生成描述**：提供Google Gemini和OpenAI接口。
+- ⚙️ **增加AI一键自动生成描述**：提供Workers AI,Google Gemini和OpenAI接口。
 - 📝 **增加logo自动生成**：默认使用 https://favicon.im 接口，可在环境变量中自定义
 - 📦 **导入导出数据**：提供书签数据的导入与导出，支持chorme导出的html格式一键导入
 
