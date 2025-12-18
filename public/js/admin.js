@@ -42,6 +42,21 @@ function showMessage(text, type = 'info') {
   }, 3000);
 }
 
+function updatePaginationButtons() {
+  if (prevPageBtn) prevPageBtn.disabled = currentPage <= 1;
+  if (nextPageBtn) nextPageBtn.disabled = currentPage >= Math.ceil(totalItems / pageSize);
+}
+
+function updateCategoryPaginationButtons() {
+  if (categoryPrevPageBtn) categoryPrevPageBtn.disabled = categoryCurrentPage <= 1;
+  if (categoryNextPageBtn) categoryNextPageBtn.disabled = categoryCurrentPage >= Math.ceil(categoryTotalItems / categoryPageSize);
+}
+
+function updatePendingPaginationButtons() {
+  if (pendingPrevPageBtn) pendingPrevPageBtn.disabled = pendingCurrentPage <= 1;
+  if (pendingNextPageBtn) pendingNextPageBtn.disabled = pendingCurrentPage >= Math.ceil(pendingTotalItems / pendingPageSize);
+}
+
 var escapeHTML = function (value) {
   if (value === null || value === undefined) {
     return '';
@@ -86,6 +101,8 @@ tabButtons.forEach(button => {
     })
     if (tab === 'categories') {
       fetchCategories();
+    } else if (tab === 'pending') {
+      fetchPendingConfigs();
     }
   });
 });
@@ -154,6 +171,61 @@ if (categoryPageSizeSelect) {
     categoryPageSize = parseInt(categoryPageSizeSelect.value);
     categoryCurrentPage = 1;
     fetchCategories(categoryCurrentPage);
+  });
+}
+
+// Pagination Event Listeners
+if (prevPageBtn) {
+  prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      fetchConfigs(currentPage, currentSearchKeyword, currentCategoryFilter);
+    }
+  });
+}
+
+if (nextPageBtn) {
+  nextPageBtn.addEventListener('click', () => {
+    if (currentPage < Math.ceil(totalItems / pageSize)) {
+      currentPage++;
+      fetchConfigs(currentPage, currentSearchKeyword, currentCategoryFilter);
+    }
+  });
+}
+
+if (categoryPrevPageBtn) {
+  categoryPrevPageBtn.addEventListener('click', () => {
+    if (categoryCurrentPage > 1) {
+      categoryCurrentPage--;
+      fetchCategories(categoryCurrentPage);
+    }
+  });
+}
+
+if (categoryNextPageBtn) {
+  categoryNextPageBtn.addEventListener('click', () => {
+    if (categoryCurrentPage < Math.ceil(categoryTotalItems / categoryPageSize)) {
+      categoryCurrentPage++;
+      fetchCategories(categoryCurrentPage);
+    }
+  });
+}
+
+if (pendingPrevPageBtn) {
+  pendingPrevPageBtn.addEventListener('click', () => {
+    if (pendingCurrentPage > 1) {
+      pendingCurrentPage--;
+      fetchPendingConfigs(pendingCurrentPage);
+    }
+  });
+}
+
+if (pendingNextPageBtn) {
+  pendingNextPageBtn.addEventListener('click', () => {
+    if (pendingCurrentPage < Math.ceil(pendingTotalItems / pendingPageSize)) {
+      pendingCurrentPage++;
+      fetchPendingConfigs(pendingCurrentPage);
+    }
   });
 }
 
@@ -425,6 +497,86 @@ function fetchConfigs(page = currentPage, keyword = currentSearchKeyword, catalo
     })
 }
 
+function fetchPendingConfigs(page = pendingCurrentPage) {
+  if (!pendingTableBody) return;
+  pendingTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10">加载中...</td></tr>';
+  fetch(`/api/pending?page=${page}&pageSize=${pendingPageSize}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200) {
+        pendingTotalItems = data.total;
+        pendingCurrentPage = data.page;
+        pendingTotalPagesSpan.innerText = Math.ceil(pendingTotalItems / pendingPageSize);
+        pendingCurrentPageSpan.innerText = pendingCurrentPage;
+        allPendingConfigs = data.data;
+        renderPendingConfigs(allPendingConfigs);
+        updatePendingPaginationButtons();
+      } else {
+        showMessage(data.message, 'error');
+      }
+    }).catch(err => {
+      showMessage('网络错误', 'error');
+    });
+}
+
+function renderPendingConfigs(configs) {
+  if (!pendingTableBody) return;
+  pendingTableBody.innerHTML = '';
+  if (configs.length === 0) {
+    pendingTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10">暂无待审核数据</td></tr>';
+    return;
+  }
+  configs.forEach(config => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="p-3 border-b">${config.id}</td>
+      <td class="p-3 border-b">${escapeHTML(config.name)}</td>
+      <td class="p-3 border-b truncate max-w-[200px]" title="${config.url}">${escapeHTML(config.url)}</td>
+      <td class="p-3 border-b">${config.logo ? `<img src="${escapeHTML(normalizeUrl(config.logo))}" class="w-8 h-8 rounded">` : '无'}</td>
+      <td class="p-3 border-b max-w-[200px] truncate" title="${config.desc}">${escapeHTML(config.desc)}</td>
+      <td class="p-3 border-b">${escapeHTML(config.catelog)}</td>
+      <td class="p-3 border-b">
+        <div class="flex gap-2">
+          <button class="approve-btn bg-green-100 text-green-600 hover:bg-green-200 px-2 py-1 rounded text-xs" data-id="${config.id}">通过</button>
+          <button class="reject-btn bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded text-xs" data-id="${config.id}">拒绝</button>
+        </div>
+      </td>
+    `;
+    pendingTableBody.appendChild(tr);
+  });
+  bindPendingActionEvents();
+}
+
+function bindPendingActionEvents() {
+  document.querySelectorAll('.approve-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      handlePendingAction(this.dataset.id, 'approve');
+    });
+  });
+  document.querySelectorAll('.reject-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      handlePendingAction(this.dataset.id, 'reject');
+    });
+  });
+}
+
+function handlePendingAction(id, action) {
+  const method = action === 'approve' ? 'POST' : 'DELETE';
+  const url = `/api/pending/${id}`;
+  
+  fetch(url, { method: method })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 || data.code === 201) {
+        showMessage(action === 'approve' ? '审批通过' : '已拒绝', 'success');
+        fetchPendingConfigs();
+        if (action === 'approve') fetchConfigs();
+      } else {
+        showMessage(data.message, 'error');
+      }
+    }).catch(() => showMessage('操作失败', 'error'));
+}
+
 function renderConfig(configs) {
   if (!configGrid) return;
   configGrid.innerHTML = '';
@@ -643,8 +795,9 @@ function fetchCategories(page = categoryCurrentPage) {
         showMessage(data.message || '加载分类失败', 'error');
         categoryGrid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">加载失败</div>';
       }
-    }).catch(() => {
-      showMessage('网络错误', 'error');
+    }).catch((err) => {
+      console.error('Fetch Categories Error:', err);
+      showMessage('网络错误: ' + err.message, 'error');
       categoryGrid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">加载失败</div>';
     });
 }
