@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  <strong>🌐 在线体验:</strong> <a href="https://iori.hidns.vip/">https://iori.hidns.vip</a>
+  <strong>🌐 在线体验:</strong> <a href="https://starx.cc.cd/">https://starx.cc.cd</a>
 </p>
 
 ---
