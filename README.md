@@ -1,4 +1,4 @@
-# 灰色轨迹 - 精品网址导航站
+# starX - 精品网址导航站
 
 <p align="center">
   一个优雅、快速、易于部署的书签（网址）收藏与分享平台，完全基于 Cloudflare 全家桶构建。
@@ -258,8 +258,8 @@ npx wrangler d1 execute book --local --file=schema.sql
 
 ## 📞 联系方式
 
-- **项目作者**：[@灰色轨迹](https://github.com/jy02739244)
-- **项目链接**：[https://github.com/jy02739244/iori-nav](https://github.com/jy02739244/iori-nav)
+- **项目作者**：[@starX](https://github.com/iceqm)
+- **项目链接**：[https://github.com/iceqm/starx-nav](https://github.com/iceqm/starx-nav)
 
 <p align="center">如果你喜欢这个项目，请给它一个 ⭐️！</p>
 
